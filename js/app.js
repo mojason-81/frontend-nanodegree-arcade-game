@@ -4,10 +4,10 @@
 var Enemy = function() {
     // Variables applied to each of our instances go here,
     // we've provided one for you to get started
-    this.initialY = [73, 145, 218];
-    this.randomY = (this.initialY[Math.floor(Math.random() * this.initialY.length)]);
-    this.speed = [50, 75, 101, 202];
-    this.randomSpeed = (this.speed[Math.floor(Math.random() * this.speed.length)]);
+    this.initialY = [73, 156, 239];
+    this.randomY = (this.initialY[Math.floor(Math.random() * this.initialY.length)]); // TODO need to abstract to fn
+    this.speed = [75, 101, 150, 202];
+    this.randomSpeed = (this.speed[Math.floor(Math.random() * this.speed.length)]); // TODO need to abstract to fn
     this.x = -101;
     this.y = this.randomY;
     // The image/sprite for our enemies, this uses
@@ -27,9 +27,10 @@ Enemy.prototype.update = function(dt) {
     //console.log(this.randomSpeed);
     if (this.x > 600) {
       this.x = -101;
-      this.y = (this.initialY[Math.floor(Math.random() * this.initialY.length)]);
-      this.randomSpeed = (this.speed[Math.floor(Math.random() * this.speed.length)]);
+      this.y = (this.initialY[Math.floor(Math.random() * this.initialY.length)]); // TODO need to abstract to fn
+      this.randomSpeed = (this.speed[Math.floor(Math.random() * this.speed.length)]); // TODO need to abstract to fn
     }
+    collision();
     //console.log(this.x);
 };
 
@@ -73,10 +74,15 @@ Player.prototype.handleInput = function(direction) {
   console.log("X is: ", this.x, "Y is: ", this.y);
 };
 
+Player.prototype.startOver = function() {
+  this.x = 200;
+  this.y = 405;
+};
+
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 var allEnemies = [];
-for (i = 0; i < 4; i ++) {
+for (i = 0; i < 5; i ++) {
   allEnemies.push(new Enemy());
   console.log(allEnemies);
 }
@@ -97,3 +103,15 @@ document.addEventListener('keyup', function(e) {
 
     player.handleInput(allowedKeys[e.keyCode]);
 });
+
+// Collision detection
+var collision = function(){
+  allEnemies.forEach(function(enemy){
+    if ((enemy.y - player.y < 30) && (enemy.x - player.x < 30)){
+      if ((enemy.y - player.y > -30) && (enemy.x - player.x > -30)){
+        console.log("Y: ", enemy.y - player.y, "X: ", enemy.x - player.x);
+        player.startOver();
+      }
+    }
+  });
+};
