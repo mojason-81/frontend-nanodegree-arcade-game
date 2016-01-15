@@ -1,4 +1,13 @@
-
+var collectibles =
+    {
+      "blueGem": "images/Gem\ Blue.png",
+      "greenGem": "images/Gem\ Green.png",
+      "orangeGem": "images/Gem\ Orange.png",
+      "heart": "images/Heart.png",
+      "key": "images/Key.png",
+      "rock": "images/Rock.png",
+      "star": "images/Star.png"
+    };
 
 // Enemies our player must avoid
 var Enemy = function() {
@@ -46,12 +55,14 @@ Enemy.prototype.render = function() {
 // a handleInput() method.
 
 var Player = function() {
+  this.lives = 3;
   this.x = 200;
   this.y = 405;
   this.sprite = 'images/char-boy.png';
 };
 
 Player.prototype.update = function(dt) {
+  //XXX Perhaps this could be used to determine collectibles on-hand
 };
 
 Player.prototype.render = function() {
@@ -71,12 +82,26 @@ Player.prototype.handleInput = function(direction) {
   else if (direction === 'right' && this.x < 400) {
     this.x += 100;
   }
-  console.log("X is: ", this.x, "Y is: ", this.y);
+  //console.log("X is: ", this.x, "Y is: ", this.y);
+};
+
+Player.prototype.gameover = function() { //FIXME this needs to actually reset the game.
+  console.log("Gameover Fool!");
+  this.lives = 3;
 };
 
 Player.prototype.startOver = function() {
-  this.x = 200;
-  this.y = 405;
+  this.lives -= 1;
+  if (this.lives > 0){
+    this.x = 200;
+    this.y = 405;
+  }
+  else {
+    this.x = 200;
+    this.y = 405;
+    player.gameover();
+  }
+  console.log("Lives: ", this.lives);
 };
 
 // Now instantiate your objects.
@@ -84,7 +109,7 @@ Player.prototype.startOver = function() {
 var allEnemies = [];
 for (i = 0; i < 5; i ++) {
   allEnemies.push(new Enemy());
-  console.log(allEnemies);
+  //console.log(allEnemies);
 }
 // Place the player object in a variable called player
 var player = new Player();
@@ -109,7 +134,7 @@ var collision = function(){
   allEnemies.forEach(function(enemy){
     if ((enemy.y - player.y < 30) && (enemy.x - player.x < 30)){
       if ((enemy.y - player.y > -30) && (enemy.x - player.x > -30)){
-        console.log("Y: ", enemy.y - player.y, "X: ", enemy.x - player.x);
+        //console.log("Y: ", enemy.y - player.y, "X: ", enemy.x - player.x);
         player.startOver();
       }
     }
