@@ -1,20 +1,20 @@
-# H1 frontend-nanodegree-arcade-game
+# Udacity frontend-nanodegree-arcade-game
 ===============================
 
-Students should use this rubric: https://www.udacity.com/course/viewer#!/c-ud015/l-3072058665/m-3072588797
+**Students should use this rubric: https://www.udacity.com/course/viewer#!/c-ud015/l-3072058665/m-3072588797
 
-for self-checking their submission.
+for self-checking their submission.**
 
 
-Frogger (clone) Game
+### Frogger (clone) Game
 
 This is an in-browser game that runs on JavaScript
 
-Browser requirements.
+#### Browser requirements.
 
 Any modern browser should do.
 
-To run the game.
+#### To run the game.
 
 Simply open index.html from the root directory in your browser.
 You can also, type the complete path into the address bar of your browser.
