@@ -9,16 +9,28 @@ var collectibles =
       "star": "images/Star.png"
     };
 
+var randomY = function(caller) {
+  caller.positionY = [73, 156, 239];
+  return (caller.positionY[Math.floor(Math.random() * caller.positionY.length)]);
+};
+
+var randomSpeed = function(caller) {
+  caller.speed = [75, 101, 150, 202];
+  return (caller.speed[Math.floor(Math.random() * caller.speed.length)]);
+};
+
+var Collectible = function() {
+  this.positionY = undefined;
+  this.positionX = undefined;
+};
+
 // Enemies our player must avoid
 var Enemy = function() {
     // Variables applied to each of our instances go here,
     // we've provided one for you to get started
-    this.initialY = [73, 156, 239];
-    this.randomY = (this.initialY[Math.floor(Math.random() * this.initialY.length)]); // TODO need to abstract to fn
-    this.speed = [75, 101, 150, 202];
-    this.randomSpeed = (this.speed[Math.floor(Math.random() * this.speed.length)]); // TODO need to abstract to fn
-    this.x = -101;
-    this.y = this.randomY;
+    this.speed = randomSpeed(this);
+    this.x = -100;
+    this.y = randomY(this);
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
     this.sprite = 'images/enemy-bug.png';
@@ -30,17 +42,13 @@ Enemy.prototype.update = function(dt) {
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
     // all computers.
-    //console.log(this.x);
-    this.x += this.randomSpeed * dt;
-    //console.log(this.x);
-    //console.log(this.randomSpeed);
+    this.x += this.speed * dt;
     if (this.x > 600) {
-      this.x = -101;
-      this.y = (this.initialY[Math.floor(Math.random() * this.initialY.length)]); // TODO need to abstract to fn
-      this.randomSpeed = (this.speed[Math.floor(Math.random() * this.speed.length)]); // TODO need to abstract to fn
+      this.x = -100;
+      this.y = randomY(this);
+      this.speed = randomSpeed(this);
     }
     collision();
-    //console.log(this.x);
 };
 
 // Draw the enemy on the screen, required method for game
