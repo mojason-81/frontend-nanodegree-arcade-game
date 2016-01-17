@@ -151,9 +151,8 @@ var Engine = (function(global) {
         allEnemies.forEach(function(enemy) {
             enemy.render();
         });
-
         player.render();
-
+        gameData.render();
         allCollectibles.forEach(function(collectible) {
           collectible.render();
         });
