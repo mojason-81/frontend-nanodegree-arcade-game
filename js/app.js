@@ -46,7 +46,6 @@ Collectible.prototype.render = function() {
   ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
-
 // Enemies our player must avoid
 var Enemy = function() {
     // Variables applied to each of our instances go here,
@@ -93,6 +92,10 @@ var Player = function() {
 };
 
 Player.prototype.update = function(dt) {
+  if (this.y === -10) {
+    gameData.score += 20;
+    this.startOver();
+  }
   //XXX Perhaps this could be used to determine collectibles on-hand
 };
 
@@ -117,12 +120,15 @@ Player.prototype.handleInput = function(direction) {
 
 Player.prototype.gameover = function() { //FIXME this needs to actually reset the game.
   console.log("Gameover Fool!");
-  this.lives = 3;
+  gameData.reset();
 };
 
 Player.prototype.startOver = function() { //FIXME this needs to actually give a game over screen
-  this.lives -= 1;
-  if (this.lives > 0){
+  if (enemyCollision === true) {
+    gameData.lives -= 1;
+    enemyCollision = false;
+  }
+  if (gameData.lives > 0){
     this.x = 200;
     this.y = 405;
   }
@@ -131,7 +137,65 @@ Player.prototype.startOver = function() { //FIXME this needs to actually give a 
     this.y = 405;
     player.gameover();
   }
-  console.log("Lives: ", this.lives);
+};
+
+// Game data to be displayed on game board
+var GameData = function() {
+  this.lives = 3;
+  this.score = 0;
+  this.level = 0;
+};
+
+// Render game data on game board
+GameData.prototype.render = function() {
+  var livesText = "Lives: " + gameData.lives;
+  var scoreText = "Score: " + gameData.score;
+  var textBoxWidth;
+  ctx.font = "22px sans-serif";
+  switch(gameData.lives) {
+    case 2:
+      ctx.fillStyle = "yellow";
+      break;
+    case 1:
+      ctx.fillStyle = "red";
+      break;
+    default:
+      ctx.fillStyle = "green";
+  }
+  // Dynamically set the width of the text box for game data
+  if (gameData.score === 0){
+    textBoxWidth = 92;
+  } else if (gameData.score < 100) {
+    textBoxWidth = 105;
+  } else if (gameData.score < 999) {
+    textBoxWidth = 115;
+  }
+  else {
+    textBoxWidth = 127;
+  }
+  ctx.fillRect(5, 480, textBoxWidth, 50);
+  ctx.textAlign = "left";
+  ctx.fillStyle = "black";
+  //ctx.strokeStyle = "white";
+  ctx.shadowColor = "white";
+  ctx.shadowOffsetX = "10px";
+  ctx.shadowOffsetY = "10px";
+  ctx.lineWidth = 0.5;
+  ctx.fillText(livesText, 10, 500);
+  ctx.strokeText(livesText, 10, 500);
+  ctx.fillText(scoreText, 10, 525);
+  ctx.strokeText(scoreText, 10, 525);
+};
+
+GameData.prototype.update = function() {
+  // This is where all the game data is updated...maybe
+};
+
+// Reset game data on Game Over
+GameData.prototype.reset = function() {
+  this.lives = 3;
+  this.score = 0;
+  this.level = 0;
 };
 
 // Instantiate Collectibles
@@ -155,6 +219,9 @@ for (i = 0; i < 2; i ++) {
   allCollectibles.push(new Collectible());
 }
 
+// Instantiate new gameData object to hold game data
+var gameData = new GameData();
+
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
 document.addEventListener('keyup', function(e) {
@@ -169,11 +236,12 @@ document.addEventListener('keyup', function(e) {
 });
 
 // Collision detection
+var enemyCollision = false;
 var collision = function(){
   allEnemies.forEach(function(enemy){
     if ((enemy.y - player.y < 30) && (enemy.x - player.x < 30)){
       if ((enemy.y - player.y > -30) && (enemy.x - player.x > -30)){
-        //console.log("Y: ", enemy.y - player.y, "X: ", enemy.x - player.x);
+        enemyCollision = true;
         player.startOver();
       }
     }
