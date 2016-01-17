@@ -1,36 +1,59 @@
 var collectibles =
     {
-      "blueGem": "images/Gem\ Blue.png",
-      "greenGem": "images/Gem\ Green.png",
-      "orangeGem": "images/Gem\ Orange.png",
-      "heart": "images/Heart.png",
-      "key": "images/Key.png",
-      "rock": "images/Rock.png",
-      "star": "images/Star.png"
+      "blueGem":    "images/Gem\ Blue.png",
+      "greenGem":   "images/Gem\ Green.png",
+      "orangeGem":  "images/Gem\ Orange.png",
+      "heart":      "images/Heart.png",
+      "key":        "images/Key.png",
+      "rock":       "images/Rock.png",
+      "star":       "images/Star.png"
     };
 
-var randomY = function(caller) {
-  caller.positionY = [73, 156, 239];
-  return (caller.positionY[Math.floor(Math.random() * caller.positionY.length)]);
+// Generate a random starting point on the Y axis for player and enemies
+var randomY = function() {
+  positionY = [73, 156, 239];
+  return (positionY[Math.floor(Math.random() * positionY.length)]);
 };
 
-var randomSpeed = function(caller) {
-  caller.speed = [75, 101, 150, 202];
-  return (caller.speed[Math.floor(Math.random() * caller.speed.length)]);
+// Generate a random X position for the collectibles
+var randomX = function () {
+  positionX = [0, 100, 200, 300, 400];
+  return (positionX[Math.floor(Math.random() * positionX.length)]);
 };
 
+// Generate a random speed for the enemies to move across screen
+var randomSpeed = function() {
+  speed = [75, 101, 150, 202];
+  return (speed[Math.floor(Math.random() * speed.length)]);
+};
+
+// Generate random collectibles to be rendered on game board
+var randomCollectible = function() {
+  var collectibleKeys = Object.keys(collectibles);
+  var randomKey = collectibleKeys[Math.floor(Math.random() * collectibleKeys.length)];
+  return collectibles[randomKey];
+};
+
+// Define collectible position
 var Collectible = function() {
-  this.positionY = undefined;
-  this.positionX = undefined;
+  this.y = randomY();
+  this.x = randomX();
+  this.sprite = randomCollectible();
 };
+
+// Render collectibles on game board
+Collectible.prototype.render = function() {
+  ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+};
+
 
 // Enemies our player must avoid
 var Enemy = function() {
     // Variables applied to each of our instances go here,
     // we've provided one for you to get started
-    this.speed = randomSpeed(this);
+    this.speed = randomSpeed();
     this.x = -100;
-    this.y = randomY(this);
+    this.y = randomY();
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
     this.sprite = 'images/enemy-bug.png';
@@ -90,7 +113,6 @@ Player.prototype.handleInput = function(direction) {
   else if (direction === 'right' && this.x < 400) {
     this.x += 100;
   }
-  //console.log("X is: ", this.x, "Y is: ", this.y);
 };
 
 Player.prototype.gameover = function() { //FIXME this needs to actually reset the game.
@@ -98,7 +120,7 @@ Player.prototype.gameover = function() { //FIXME this needs to actually reset th
   this.lives = 3;
 };
 
-Player.prototype.startOver = function() {
+Player.prototype.startOver = function() { //FIXME this needs to actually give a game over screen
   this.lives -= 1;
   if (this.lives > 0){
     this.x = 200;
@@ -112,17 +134,26 @@ Player.prototype.startOver = function() {
   console.log("Lives: ", this.lives);
 };
 
-// Now instantiate your objects.
-// Place all enemy objects in an array called allEnemies
+// Instantiate Collectibles
+var allCollectibles = [];
+for (i = 0; i < 2; i ++) {
+  allCollectibles.push(new Collectible());
+}
+
+// Instantiate Enemies
 var allEnemies = [];
 for (i = 0; i < 5; i ++) {
   allEnemies.push(new Enemy());
-  //console.log(allEnemies);
 }
-// Place the player object in a variable called player
+
+// Instantiate Player
 var player = new Player();
 
-
+// Instantiate Collectibles
+var allCollectibles = [];
+for (i = 0; i < 2; i ++) {
+  allCollectibles.push(new Collectible());
+}
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
