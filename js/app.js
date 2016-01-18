@@ -1,12 +1,33 @@
 var collectibles =
     {
-      "blueGem":    "images/Gem\ Blue.png",
-      "greenGem":   "images/Gem\ Green.png",
-      "orangeGem":  "images/Gem\ Orange.png",
-      "heart":      "images/Heart.png",
-      "key":        "images/Key.png",
-      "rock":       "images/Rock.png",
-      "star":       "images/Star.png"
+      "blueGem": {
+          "path":  "images/Gem\ Blue.png",
+          "score": 20
+        },
+      "greenGem": {
+          "path":  "images/Gem\ Green.png",
+          "score": 30
+        },
+      "orangeGem": {
+          "path":  "images/Gem\ Orange.png",
+          "score": 40
+        },
+      "heart": {
+          "path":  "images/Heart.png",
+          "score": 50
+        },
+      "key": {
+          "path":  "images/Key.png",
+          "score": 60
+        },
+      "rock": {
+          "path":  "images/Rock.png",
+          "score": 5
+        },
+      "star": {
+          "path":  "images/Star.png",
+          "score": 75
+        }
     };
 
 // Generate a random starting point on the Y axis for player and enemies
@@ -31,19 +52,47 @@ var randomSpeed = function() {
 var randomCollectible = function() {
   var collectibleKeys = Object.keys(collectibles);
   var randomKey = collectibleKeys[Math.floor(Math.random() * collectibleKeys.length)];
-  return collectibles[randomKey];
+  return [collectibles[randomKey].path, collectibles[randomKey].score];
 };
 
-// Define collectible position
+// Define collectible
 var Collectible = function() {
+  var currentCollectible = this;
   this.y = randomY();
   this.x = randomX();
-  this.sprite = randomCollectible();
+
+  /* TODO ######################################################
+  ## randomCollectible() returns an array containing the path to the
+  ## sprite image and the score of the collectible.  Calling
+  ## setSpriteAndScore() allows you to grab the path and score of a
+  ## single collectible object.  In order to abstract this
+  ## functionality, I need to figure out how to map those two properties
+  ## to the two array items returned by randomCollectible(). Without
+  ## calling randomCollectible() twice.
+  ## ########################################################## */
+
+  var setSpriteAndScore = function(currentCollectible, spriteAndScore) {
+    currentCollectible.sprite = spriteAndScore[0];
+    currentCollectible.score = spriteAndScore[1];
+  };
+  setSpriteAndScore(currentCollectible, randomCollectible());
 };
 
 // Render collectibles on game board
 Collectible.prototype.render = function() {
   ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+};
+
+
+// Updates gameData by watching for collisions with collectibles
+// TODO This can probably be refactored into gameData.update()
+Collectible.prototype.update = function() {
+  if (this.x === player.x && this.y === player.y) {
+    this.xPos = this.x;
+    this.x = 600;
+    gameData.score += this.score;
+    console.log(this);
+  }
 };
 
 // Enemies our player must avoid
@@ -61,23 +110,21 @@ var Enemy = function() {
 // Update the enemy's position, required method for game
 // Parameter: dt, a time delta between ticks
 Enemy.prototype.update = function(dt) {
-    // You should multiply any movement by the dt parameter
-    // which will ensure the game runs at the same speed for
-    // all computers.
-    this.x += this.speed * dt;
-    if (this.x > 600) {
-      this.x = -100;
-      this.y = randomY(this);
-      this.speed = randomSpeed(this);
-    }
-    collision();
+  // You should multiply any movement by the dt parameter
+  // which will ensure the game runs at the same speed for
+  // all computers.
+  this.x += this.speed * dt;
+  if (this.x > 600) {
+    this.x = -100;
+    this.y = randomY(this);
+    this.speed = randomSpeed(this);
+  }
+  collision();
 };
 
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function() {
-    //if (this.x > 0) {
-      ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-    //}
+  ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
 // Now write your own player class
@@ -89,14 +136,30 @@ var Player = function() {
   this.x = 200;
   this.y = 405;
   this.sprite = 'images/char-boy.png';
+  this.score = 0;
 };
 
-Player.prototype.update = function(dt) {
+Player.prototype.update = function() {
   if (this.y === -10) {
-    gameData.score += 20;
+    player.reachWater();
+    //TODO Would like to put a delay in before calling .startOver()
     this.startOver();
   }
-  //XXX Perhaps this could be used to determine collectibles on-hand
+};
+
+Player.prototype.reachWater = function() {
+  allCollectibles.forEach(function(collectible) {
+    var setSpriteAndScore = function(currentCollectible, spriteAndScore) {
+      currentCollectible.sprite = spriteAndScore[0];
+      currentCollectible.score = spriteAndScore[1];
+    };
+    setSpriteAndScore(collectible, randomCollectible());
+    collectible.x = randomX();
+    collectible.render();
+    gameData.score += 20;
+    player.score = gameData.score;
+  });
+  this.score = gameData.score;
 };
 
 Player.prototype.render = function() {
@@ -118,16 +181,22 @@ Player.prototype.handleInput = function(direction) {
   }
 };
 
-Player.prototype.gameover = function() { //FIXME this needs to actually reset the game.
+Player.prototype.gameover = function() { //TODO this needs to actually give a game over screen
   console.log("Gameover Fool!");
   gameData.reset();
 };
 
-Player.prototype.startOver = function() { //FIXME this needs to actually give a game over screen
+Player.prototype.startOver = function() {
   if (enemyCollision === true) {
+    gameData.score = this.score;
     gameData.lives -= 1;
     enemyCollision = false;
+    allCollectibles.forEach(function(collectible) {
+      collectible.x = collectible.xPos;
+      collectible.render();
+    });
   }
+
   if (gameData.lives > 0){
     this.x = 200;
     this.y = 405;
@@ -150,7 +219,8 @@ var GameData = function() {
 GameData.prototype.render = function() {
   var livesText = "Lives: " + gameData.lives;
   var scoreText = "Score: " + gameData.score;
-  var textBoxWidth;
+  // Dynamically set the width of the text box for game data
+  var textBoxWidth = ctx.measureText(scoreText).width + 10;
   ctx.font = "22px sans-serif";
   switch(gameData.lives) {
     case 2:
@@ -162,21 +232,10 @@ GameData.prototype.render = function() {
     default:
       ctx.fillStyle = "green";
   }
-  // Dynamically set the width of the text box for game data
-  if (gameData.score === 0){
-    textBoxWidth = 92;
-  } else if (gameData.score < 100) {
-    textBoxWidth = 105;
-  } else if (gameData.score < 999) {
-    textBoxWidth = 115;
-  }
-  else {
-    textBoxWidth = 127;
-  }
+  // Render text on game board
   ctx.fillRect(5, 480, textBoxWidth, 50);
   ctx.textAlign = "left";
   ctx.fillStyle = "black";
-  //ctx.strokeStyle = "white";
   ctx.shadowColor = "white";
   ctx.shadowOffsetX = "10px";
   ctx.shadowOffsetY = "10px";
@@ -188,7 +247,7 @@ GameData.prototype.render = function() {
 };
 
 GameData.prototype.update = function() {
-  // This is where all the game data is updated...maybe
+  // No op
 };
 
 // Reset game data on Game Over
@@ -196,6 +255,7 @@ GameData.prototype.reset = function() {
   this.lives = 3;
   this.score = 0;
   this.level = 0;
+  player.score = this.score;
 };
 
 // Instantiate Collectibles
@@ -225,14 +285,13 @@ var gameData = new GameData();
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
 document.addEventListener('keyup', function(e) {
-    var allowedKeys = {
-        37: 'left',
-        38: 'up',
-        39: 'right',
-        40: 'down'
-    };
-
-    player.handleInput(allowedKeys[e.keyCode]);
+  var allowedKeys = {
+    37: 'left',
+    38: 'up',
+    39: 'right',
+    40: 'down'
+  };
+  player.handleInput(allowedKeys[e.keyCode]);
 });
 
 // Collision detection
