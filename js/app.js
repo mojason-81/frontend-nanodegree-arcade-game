@@ -32,19 +32,19 @@ var collectibles =
 
 // Generate a random starting point on the Y axis for player and enemies
 var randomY = function() {
-  positionY = [73, 156, 239];
+  var positionY = [73, 156, 239];
   return (positionY[Math.floor(Math.random() * positionY.length)]);
 };
 
 // Generate a random X position for the collectibles
 var randomX = function () {
-  positionX = [0, 100, 200, 300, 400];
+  var positionX = [0, 100, 200, 300, 400];
   return (positionX[Math.floor(Math.random() * positionX.length)]);
 };
 
 // Generate a random speed for the enemies to move across screen
 var randomSpeed = function() {
-  speed = [75, 101, 150, 202];
+  var speed = [75, 101, 150, 202];
   return (speed[Math.floor(Math.random() * speed.length)]);
 };
 
