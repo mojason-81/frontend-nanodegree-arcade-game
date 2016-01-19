@@ -1,34 +1,34 @@
 var collectibles =
-    {
-      "blueGem": {
-          "path":  "images/Gem\ Blue.png",
-          "score": 20
-        },
-      "greenGem": {
-          "path":  "images/Gem\ Green.png",
-          "score": 30
-        },
-      "orangeGem": {
-          "path":  "images/Gem\ Orange.png",
-          "score": 40
-        },
-      "heart": {
-          "path":  "images/Heart.png",
-          "score": 50
-        },
-      "key": {
-          "path":  "images/Key.png",
-          "score": 60
-        },
-      "rock": {
-          "path":  "images/Rock.png",
-          "score": 5
-        },
-      "star": {
-          "path":  "images/Star.png",
-          "score": 75
-        }
-    };
+  {
+    'blueGem': {
+      'path':  'images/Gem\ Blue.png',
+      'score': 20
+    },
+    'greenGem': {
+      'path':  'images/Gem\ Green.png',
+      'score': 30
+    },
+    'orangeGem': {
+      'path':  'images/Gem\ Orange.png',
+      'score': 40
+    },
+    'heart': {
+      'path':  'images/Heart.png',
+      'score': 50
+    },
+    'key': {
+      'path':  'images/Key.png',
+      'score': 60
+    },
+    'rock': {
+      'path':  'images/Rock.png',
+      'score': 5
+    },
+    'star': {
+      'path':  'images/Star.png',
+      'score': 75
+    }
+  };
 
 // Generate a random starting point on the Y axis for player and enemies
 var randomY = function() {
@@ -61,13 +61,13 @@ var Collectible = function() {
   this.y = randomY();
   this.x = randomX();
 
-  /* TODO ######################################################
+  /* TODO: ######################################################
   ## randomCollectible() returns an array containing the path to the
   ## sprite image and the score of the collectible.  Calling
   ## setSpriteAndScore() allows you to grab the path and score of a
   ## single collectible object.  In order to abstract this
   ## functionality, I need to figure out how to map those two properties
-  ## to the two array items returned by randomCollectible(). Without
+  ## to the two array items returned by randomCollectible() without
   ## calling randomCollectible() twice.
   ## ########################################################## */
 
@@ -85,13 +85,12 @@ Collectible.prototype.render = function() {
 
 
 // Updates gameData by watching for collisions with collectibles
-// TODO This can probably be refactored into gameData.update()
+// TODO: This can probably be refactored into gameData.update()
 Collectible.prototype.update = function() {
   if (this.x === player.x && this.y === player.y) {
     this.xPos = this.x;
     this.x = 600;
     gameData.score += this.score;
-    console.log(this);
   }
 };
 
@@ -114,7 +113,9 @@ Enemy.prototype.update = function(dt) {
   // which will ensure the game runs at the same speed for
   // all computers.
   this.x += this.speed * dt;
+  // Check if enemy has fully crossed the board
   if (this.x > 600) {
+    // Reset enemy position the left side of board
     this.x = -100;
     this.y = randomY(this);
     this.speed = randomSpeed(this);
@@ -133,6 +134,7 @@ Enemy.prototype.render = function() {
 
 var Player = function() {
   this.lives = 3;
+  // Starting X and Y position for player
   this.x = 200;
   this.y = 405;
   this.sprite = 'images/char-boy.png';
@@ -141,8 +143,8 @@ var Player = function() {
 
 Player.prototype.update = function() {
   if (this.y === -10) {
-    player.reachWater();
-    //TODO Would like to put a delay in before calling .startOver()
+    this.reachWater();
+    //TODO: Would like to put a delay in before calling .startOver()
     this.startOver();
   }
 };
@@ -156,9 +158,8 @@ Player.prototype.reachWater = function() {
     setSpriteAndScore(collectible, randomCollectible());
     collectible.x = randomX();
     collectible.render();
-    gameData.score += 20;
-    player.score = gameData.score;
   });
+  gameData.score += 20;
   this.score = gameData.score;
 };
 
@@ -166,6 +167,9 @@ Player.prototype.render = function() {
   ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
+// Move the player in response to arrow key presses
+// Prevent player from going off the board with
+//  checks of the X and Y positions
 Player.prototype.handleInput = function(direction) {
   if (direction === 'up' && this.y > -10) {
     this.y -= 83;
@@ -181,8 +185,8 @@ Player.prototype.handleInput = function(direction) {
   }
 };
 
-Player.prototype.gameover = function() { //TODO this needs to actually give a game over screen
-  console.log("Gameover Fool!");
+Player.prototype.gameover = function() { //TODO: Would like to actually add a GameOver screen
+  alert('GAME OVER Fool!');
   gameData.reset();
 };
 
@@ -204,7 +208,7 @@ Player.prototype.startOver = function() {
   else {
     this.x = 200;
     this.y = 405;
-    player.gameover();
+    this.gameover();
   }
 };
 
@@ -217,28 +221,28 @@ var GameData = function() {
 
 // Render game data on game board
 GameData.prototype.render = function() {
-  var livesText = "Lives: " + gameData.lives;
-  var scoreText = "Score: " + gameData.score;
+  var livesText = 'Lives: ' + gameData.lives;
+  var scoreText = 'Score: ' + gameData.score;
   // Dynamically set the width of the text box for game data
   var textBoxWidth = ctx.measureText(scoreText).width + 10;
-  ctx.font = "22px sans-serif";
+  ctx.font = '22px sans-serif';
   switch(gameData.lives) {
     case 2:
-      ctx.fillStyle = "yellow";
+      ctx.fillStyle = 'yellow';
       break;
     case 1:
-      ctx.fillStyle = "red";
+      ctx.fillStyle = 'red';
       break;
     default:
-      ctx.fillStyle = "green";
+      ctx.fillStyle = 'green';
   }
   // Render text on game board
   ctx.fillRect(5, 480, textBoxWidth, 50);
-  ctx.textAlign = "left";
-  ctx.fillStyle = "black";
-  ctx.shadowColor = "white";
-  ctx.shadowOffsetX = "10px";
-  ctx.shadowOffsetY = "10px";
+  ctx.textAlign = 'left';
+  ctx.fillStyle = 'black';
+  ctx.shadowColor = 'white';
+  ctx.shadowOffsetX = '10px';
+  ctx.shadowOffsetY = '10px';
   ctx.lineWidth = 0.5;
   ctx.fillText(livesText, 10, 500);
   ctx.strokeText(livesText, 10, 500);
