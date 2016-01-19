@@ -25,8 +25,9 @@ You can also type the complete path into the address bar of your browser.
 ### How to play
 
 Using the direction keys on your keyboard, move your character toward the water at the top
-of the game board.  You get 3 lives.  After being hit by a bug, your lives and score will reset.
-You get 3 lives.  Collect items on the board to increase your score.
+of the game board.  You get 3 lives.  After being hit by a bug, you will lose a life and you
+will lose any points you earned on that particular try.  Collect items on the board and reach
+the water to increase your score.  After losing all 3 lives, your score is set to 0.
 
 #### Scoring
 
