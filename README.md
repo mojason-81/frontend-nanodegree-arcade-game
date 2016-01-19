@@ -17,7 +17,7 @@ Successfully tested using up-to-date versions of Chrome and Firefox (as of 17 Ja
 #### To run the game.
 
 Simply open `index.html` from the root directory in your browser.
-You can also, type the complete path into the address bar of your browser.
+You can also type the complete path into the address bar of your browser.
   i.e. `/home/jason/projects/frogger/index.html`
   If for some reason, that doesn't work, try preceding the path with `'file://'` as follows:
     `file:///home/jason/projects/frogger/index.html`
